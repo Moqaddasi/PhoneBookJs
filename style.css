@@ -1,0 +1,53 @@
+body {
+  background-image: url(img/8e650c2277f2bccf1a64dc675ecae5cb.jpg);
+}
+div {
+  font-size: 20px;
+  color: white;
+}
+#phone-book-container {
+  width: 500px;
+  height: auto;
+  margin: auto;
+  background-color: #14131488;
+  padding: 10px;
+}
+.text {
+  color: white;
+}
+#search {
+  margin-bottom: 30px;
+}
+.input {
+  width: 100%;
+  padding: 20px;
+  display: block;
+  border: 1px solid #ccc;
+  margin: 4px 0 15px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+.submit {
+  width: 100%;
+  font-weight: bold;
+  background-color: #17a2b8;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+.div-box {
+  display: flex;
+  justify-content: space-around;
+}
+.contact-info {
+  display: block;
+}
+.delete-icon {
+  cursor: pointer;
+  color: red;
+}
