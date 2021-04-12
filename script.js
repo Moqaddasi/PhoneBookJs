@@ -107,7 +107,6 @@ function PhoneBook() {
     if (isNotValidRecord(record, this.records)) return;
     this.records.push(record);
     this.addRecordToListHtml(listContainerElement, record);
-    console.log("All records:", this.records);
     return this;
   };
   this.refreshList = function (listContainerElement, records = this.records) {
@@ -116,7 +115,6 @@ function PhoneBook() {
       this.addRecordToListHtml(listContainerElement, record);
     });
 
-    console.log("All records:", records);
     return this;
   };
   this.search = function (listContainerElement, name) {
@@ -125,7 +123,6 @@ function PhoneBook() {
     );
     this.refreshList(listContainerElement, list);
 
-    console.log("search result:", list);
     return this;
   };
   this.removeFromRecord = function (record) {
@@ -199,7 +196,6 @@ function Render(container) {
 
     const hr = builder.create("hr").appendTo(container);
     contactList.appendTo(container);
-    console.log(header, addNewContactHeader, addButton, hr, contactList);
   };
 
   //other functions

@@ -46,6 +46,7 @@ div {
 }
 .contact-info {
   display: block;
+  margin: 5px;
 }
 .delete-icon {
   cursor: pointer;
