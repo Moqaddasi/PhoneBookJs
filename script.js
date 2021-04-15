@@ -63,89 +63,81 @@ const builder = {
 function PhoneBookRecord(name, phone) {
   this.name = name;
   this.phone = phone;
+  return this;
 }
-const generateHtmlRecord = (record, onRemoveHandler) => {
-  const htmlRecord = builder.create("div").setClasses("div-box");
-  const htmlRecordElement = htmlRecord.element;
-  builder
-    .create("div")
-    .setText(record.name)
-    .setClasses("contact-info")
-    .appendTo(htmlRecordElement);
 
-  builder
-    .create("div")
-    .setText(record.phone)
-    .setClasses("contact-info")
-    .appendTo(htmlRecordElement);
-
-  const deleteButton = builder
-    .create("span")
-    .setClasses("delete-icon")
-    .appendTo(htmlRecordElement)
-    .onClick(onRemoveHandler);
-  builder.create("i").setClasses("fa fa-close").appendTo(deleteButton.element);
-  return htmlRecord;
-};
-const isNotValidRecord = (record, records) =>
-  record.name === "" ||
-  record.phone === "" ||
-  isDuplicatedRecord(record, records);
-
-const isDuplicatedRecord = (record, records) =>
-  records.find((r) => r.name == record.name && r.phone == record.phone);
 function PhoneBook() {
   this.records = [];
-  this.addRecordToListHtml = (listContainerElement, record) => {
-    const listItem = generateHtmlRecord(record, () => {
-      this.removeFromRecord(record);
-      this.refreshList(listContainerElement);
-    });
-    listItem.appendTo(listContainerElement);
-  };
-  this.add = function (listContainerElement, record = { name: "", phone: "" }) {
+  this.searchedRecords = [];
+  this.add = function (record = { name: "", phone: "" }) {
+    const isDuplicatedRecord = (rec, recs) =>
+      recs.find((r) => r.name == rec.name && r.phone == rec.phone);
+    const isNotValidRecord = (rec, recs) =>
+      rec.name === "" || rec.phone === "" || isDuplicatedRecord(rec, recs);
     if (isNotValidRecord(record, this.records)) return;
-    this.records.push(record);
-    this.addRecordToListHtml(listContainerElement, record);
-    return this;
+    this.records.unshift(new PhoneBookRecord(record.name, record.phone));
   };
-  this.refreshList = function (listContainerElement, records = this.records) {
-    listContainerElement.innerHTML = "";
-    records.forEach((record) => {
-      this.addRecordToListHtml(listContainerElement, record);
-    });
-
-    return this;
-  };
-  this.search = function (listContainerElement, name) {
-    const list = this.records.filter((record) =>
+  this.search = function (name) {
+    this.searchedRecords = this.records.filter((record) =>
       record.name.toLowerCase().includes(name.toLowerCase())
     );
-    this.refreshList(listContainerElement, list);
-
-    return this;
   };
-  this.removeFromRecord = function (record) {
+  this.remove = function (record) {
     this.records = this.records.filter(
       (rec) => rec.name !== record.name || rec.phone !== record.phone
     );
-    return this;
   };
-
-  //add search remove functions add here
 }
 
 function Render(container) {
   this.container = container;
   const phoneBook = new PhoneBook();
+  const onRemoveHandler = (listElem, record) => {
+    phoneBook.remove(record);
+    renderList(listElem, phoneBook.records);
+  };
+  const addRecordToList = (listElem, record) => {
+    const listItem = generateHtmlRecord(record, () =>
+      onRemoveHandler(listElem, record)
+    );
+    listItem.appendTo(listElem);
+  };
+  const renderList = function (listElem, records) {
+    listElem.innerHTML = "";
+    records.forEach((record) => addRecordToList(listElem, record));
+  };
+  const generateHtmlRecord = (record, removeHandler) => {
+    const htmlRecord = builder.create("div").setClasses("div-box");
+    const htmlRecordElement = htmlRecord.element;
+    builder
+      .create("div")
+      .setText(record.name)
+      .setClasses("contact-info")
+      .appendTo(htmlRecordElement);
 
+    builder
+      .create("div")
+      .setText(record.phone)
+      .setClasses("contact-info")
+      .appendTo(htmlRecordElement);
+
+    const deleteButton = builder
+      .create("span")
+      .setClasses("delete-icon")
+      .appendTo(htmlRecordElement)
+      .onClick(removeHandler);
+    builder
+      .create("i")
+      .setClasses("fa fa-close")
+      .appendTo(deleteButton.element);
+    return htmlRecord;
+  };
   this.init = function () {
     const contactList = builder.create("div").setId("list");
-
-    const header = builder
+    builder
       .create("h1")
       .setClasses("text")
-      .setText("Phonebook App")
+      .setText("PhoneBook App")
       .appendTo(container);
     const searchContactInput = builder
       .create("input")
@@ -155,11 +147,11 @@ function Render(container) {
       .setClasses("input")
       .setValue("")
       .onInput(() => {
-        phoneBook.search(contactList.element, searchContactInput.element.value);
+        phoneBook.search(searchContactInput.element.value);
+        renderList(contactList.element, phoneBook.searchedRecords);
       })
       .appendTo(container);
-
-    const addNewContactHeader = builder
+    builder
       .create("h2")
       .setClasses("text")
       .setText("Add New Contact")
@@ -181,24 +173,24 @@ function Render(container) {
       .setClasses("input")
       .setValue("")
       .appendTo(container);
-    const addButton = builder
+    builder
       .create("button")
       .setId("add")
       .setText("Add")
       .setClasses("submit")
       .onClick(() => {
-        phoneBook.add(contactList.element, {
-          name: nameInput.element.value,
-          phone: phoneInput.element.value,
-        });
+        const newRecord = new PhoneBookRecord(
+          nameInput.element.value,
+          phoneInput.element.value,
+          this.records
+        );
+        phoneBook.add(newRecord);
+        renderList(contactList.element, phoneBook.records);
       })
       .appendTo(container);
-
-    const hr = builder.create("hr").appendTo(container);
+    builder.create("hr").appendTo(container);
     contactList.appendTo(container);
   };
-
-  //other functions
 }
 
 const phoneBookContainer = document.getElementById("phone-book-container");
